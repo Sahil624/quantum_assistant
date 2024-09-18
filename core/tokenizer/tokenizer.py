@@ -11,7 +11,7 @@ import nbformat
 import re
 from glob import glob
 
-from config import config
+from core.base.config import config
 
 # Load model
 tokenizer = AutoTokenizer.from_pretrained(config["model_name"])

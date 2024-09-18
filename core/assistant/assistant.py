@@ -8,8 +8,8 @@ from pinecone import Pinecone
 import json
 import os
 
-from config import config
-from base import Conversation
+from core.base.config import config
+from core.base.conversation import Conversation
 
 # Set OpenMP environment variable to ignore duplicate library error
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
@@ -71,8 +71,7 @@ class QuantumAssistantConversation(Conversation):
             return [(self.chunks[int(i)], float(d)) for i, d in zip(indices[0], distances[0])]
 
     def process_query(self, user_query: str) -> str:
-        max_iterations = 3
-        iterations = max_iterations
+        iterations = config['max_follow_up_limit']
         response = None
 
         extracted_content = config["top_k"]
@@ -80,7 +79,7 @@ class QuantumAssistantConversation(Conversation):
         while iterations:
             print(f"<<<<<<<<<<<<<<<<<<<<<<<<<< ITERATION {iterations} >>>>>>>>>>>>>>>>>>>>>>>>")
             # Increase extracted content in followup questions
-            extracted_content += ((max_iterations - iterations) * 5)
+            extracted_content += ((config['max_follow_up_limit'] - iterations) * 5)
             query_embedding = self.create_embedding(internal_query)
             relevant_chunks = self.search_similar_chunks(query_embedding, extracted_content)
             system_prompt, context = self.prepare_system_prompt(internal_query, relevant_chunks)

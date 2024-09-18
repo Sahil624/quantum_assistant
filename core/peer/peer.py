@@ -6,7 +6,7 @@ from pinecone import Pinecone
 import json
 import os
 
-from config import config
+from core.base.config import config
 
 # Load model
 tokenizer = AutoTokenizer.from_pretrained(config["model_name"])

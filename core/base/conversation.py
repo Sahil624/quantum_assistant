@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Dict
 import uuid
 
-from config import config
+from core.base.config import config
 
 
 class Conversation(ABC):
