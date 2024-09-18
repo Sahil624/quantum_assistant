@@ -19,7 +19,7 @@ config = {
     "chunk_size": 3,  # Number of sentences per chunk
     "anthropic_api_key": os.getenv('anthropic_key'),
     "anthropic_model": os.getenv('anthropic_model'),
-    "max_follow_up_limit": os.getenv("max_follow_up_questions", 3),
+    "max_follow_up_limit": int(os.getenv("max_follow_up_questions", 3)),
     'notebook_json_path': os.getenv('notebook_json_path'),
     'cell_json_path': os.getenv('cell_json_path')
 }

@@ -195,6 +195,11 @@ def main():
         user_query = input("Enter your query (or 'quit' to exit): ")
         if user_query.lower() == 'quit':
             break
+
+        if not user_query:
+            print('Invalid Query')
+            continue
+        
         response = conversation.process_query(user_query)
         print("\n\nAssistant:", response)
 

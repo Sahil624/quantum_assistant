@@ -50,6 +50,10 @@ def main():
         else:
             query = input('Enter your query (or type "quit" to exit): ')
 
+        if not query:
+            print("Invalid input")
+            continue
+
         if query.lower() == 'quit':
             break
 

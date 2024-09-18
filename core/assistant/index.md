@@ -14,7 +14,7 @@ graph TD
     B --> C[Load Model and Tokenizer]
     B --> D[Initialize Database]
     B --> E[Load Text Chunks]
-    F[User Query] --> G[Process Query]
+    F[User Screen] --> G[Process Query]
     G --> H{Iterate up to max_follow_up_limit}
     H --> |Yes| I[Create Embedding]
     I --> J[Search Similar Chunks]
