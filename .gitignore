@@ -164,3 +164,4 @@ cython_debug/
 # Generated Files
 faiss_index.bin
 text_chunks.json
+server/static/notebooks/*.html

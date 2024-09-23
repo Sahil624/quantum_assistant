@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
 import torch
@@ -9,9 +7,9 @@ import json
 import os
 import nbformat
 import re
-from glob import glob
 
 from core.base.config import config
+from core.pre_processor.common import get_nb_files_path
 
 # Load model
 tokenizer = AutoTokenizer.from_pretrained(config["model_name"])
@@ -74,6 +72,7 @@ def index_chunks(new_chunks):
     if config["database"] == "faiss":
         faiss.write_index(index, config["faiss_index_file"])
 
+
 def extract_text_from_notebook(notebook_path):
     try:
         with open(notebook_path, 'r', encoding='utf-8') as f:
@@ -108,13 +107,7 @@ def chunk_text(text, chunk_size=3):
 
 
 def process_notebooks(directory):
-    if not os.path.exists(directory):
-        print('Invalid notebook path', directory)
-        sys.exit(-1)
-    notebook_pattern = os.path.join(directory, "**", "nanomod*unit*.ipynb")
-    print('Search path', notebook_pattern)
-    notebook_files = glob(notebook_pattern, recursive=True)
-
+    notebook_files = get_nb_files_path(directory)
     all_chunks = []
     for notebook_file in notebook_files:
         print(f"Processing notebook: {notebook_file}")
@@ -128,12 +121,17 @@ def process_notebooks(directory):
     return all_chunks
 
 
-# Main processing
-if not chunks:
-    print("Processing notebooks...")
-    new_chunks = process_notebooks(config["notebook_directory"])
-    if new_chunks:
-        index_chunks(new_chunks)
-        print("Notebook processing and indexing complete.")
-    else:
-        print("No valid chunks found in notebooks. Please check your notebook content and directory path.")
+def main():
+    # Main processing
+    if not chunks:
+        print("Processing notebooks...")
+        new_chunks = process_notebooks(config["notebook_directory"])
+        if new_chunks:
+            index_chunks(new_chunks)
+            print("Notebook processing and indexing complete.")
+        else:
+            print("No valid chunks found in notebooks. Please check your notebook content and directory path.")
+
+
+if __name__ == '__main__':
+    main()
