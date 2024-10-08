@@ -1,0 +1,32 @@
+$background: #1e272e;
+$foreground: #d2dae2;
+
+.side-menu-drawer {
+    background: $background;
+    color: $foreground;
+
+    &.collapsed {
+        width: 64px;
+    }
+
+    &:not(.collapsed) {
+        width: 30%;
+    }
+
+    .branding {
+        // a {
+        font-size: 2rem;
+        // }
+    }
+
+    .menu-items {
+        .item-button {
+            color: $foreground;
+
+            &:hover {
+                color: $background;
+                background: $foreground;
+            }
+        }
+    }
+}

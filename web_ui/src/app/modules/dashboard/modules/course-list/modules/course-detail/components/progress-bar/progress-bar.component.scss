@@ -1,0 +1,51 @@
+$background: #1e272e;
+$foreground: #d2dae2;
+
+.progress-bar-container {
+    .progress-drawer {
+        width: 300px;
+    }
+
+    .header {
+        height: 100px;
+        background: $background;
+        color: $foreground;
+    }
+
+    .los {
+        height: calc(100% - 100px);
+        overflow: auto;
+
+        .meta-text {
+            font-size: 0.6rem;
+            position: absolute;
+            top: 45px;
+            font-style: italic;
+        }
+
+        .active-item {
+            background: lighten($color: $background, $amount: 80);
+            border-radius: 16px;
+        }
+
+        .list-item {
+            .completed-indicator {
+                color: green;
+            }
+
+            &:hover {
+                @extend .active-item;
+            }
+
+            &.active {
+                @extend .active-item;
+            }
+
+            &.in-progress {
+                .active-indicator {
+                    color: orange;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,4 @@
+<app-chat-conversation title="Assistant" description="You can ask me anything related to your course!"
+    (queryEvent)="sendMessage($event)"
+    [conversation]="getConversation()">
+</app-chat-conversation>

@@ -13,10 +13,10 @@ try:
     arguments, values = getopt.getopt(argumentList, options, long_options)
     for arg, value in arguments:
         if arg in ('-c', '--core'):
-            from core.test import test_core
+            from server.core.test import test_core
             test_core(value)
         if arg in ('-p', '--pre_processor'):
-            from core.test import pre_processor
+            from server.core.test import pre_processor
             pre_processor()
 
 except getopt.error as err:

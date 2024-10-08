@@ -1,0 +1,19 @@
+.course-list-container {
+    .course-list-container {
+        display: flex;
+        flex-wrap: wrap;
+
+        .course-card {
+            max-width: 250px;
+        }
+
+        .card-footer {
+            font-size: 0.7rem;
+            justify-content: space-evenly;
+
+            mat-icon {
+                font-size: 1.3rem;
+            }
+        }
+    }
+}

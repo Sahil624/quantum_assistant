@@ -1,0 +1,43 @@
+<div class="course-list-container pad-8">
+
+    <div class="title">
+        <h2>Your Courses</h2>
+    </div>
+
+
+    <div class="course-list-container">
+        @for (course of myCourses; track course) {
+        <mat-card appearance="outlined" class="course-card margin-8 pad-8">
+            <mat-card-header>
+                <mat-card-title> {{ course.title }} </mat-card-title>
+                <mat-card-subtitle>{{ course.description }}</mat-card-subtitle>
+            </mat-card-header>
+
+
+            <div class="spacer"></div>
+
+            <mat-card-footer class="card-footer flex-centered">
+                <div class="lo-meta-info flex-centered pad-8">
+                    <mat-icon>auto_stories</mat-icon>
+                    {{ course.learning_objects.length }} Learning Objects
+                </div>
+                |
+                <div class="time-meta-info flex-centered pad-8">
+                    <mat-icon>schedule</mat-icon>
+                    {{ getTimeDetails(course).totalTime }} mins
+                </div>
+            </mat-card-footer>
+
+            <mat-card-actions align="end">
+                <button mat-flat-button [routerLink]="'learn/'+course.id.toString()">
+                    @if (getTimeDetails(course).isStarted) {
+                    Resume
+                    } @else {
+                    Start
+                    }
+                </button>
+            </mat-card-actions>
+        </mat-card>
+        }
+    </div>
+</div>

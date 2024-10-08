@@ -1,0 +1,25 @@
+.flex-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.display-flex {
+    display: flex;
+}
+
+.flex-column {
+    @extend .display-flex;
+    flex-direction: column;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.floating-fab {
+    position: fixed;
+    right: 64px;
+    bottom: 64px;
+    z-index: 10;
+}

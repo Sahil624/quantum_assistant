@@ -1,0 +1,42 @@
+<div class="chat-conversation-container pad-8">
+    <div class="header display-flex">
+        <div class="flex-centered">
+            <mat-icon class="logo flex-centered margin-8-right">smart_toy</mat-icon>
+
+            <div class="details margin-8-left">
+                <p class="title">{{ title }}</p>
+                <p class="meta">{{ description }}</p>
+            </div>
+        </div>
+
+        <button mat-icon-button class="close" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <div class="conversation-container">
+        <div class="chat-history flex-column pad-8">
+            @for (chat of conversation; track chat) {
+                <div class="message-bubble pad-8" [ngClass]="{
+                        'system-bubble': chat.from == 'system',
+                        'user-bubble': chat.from == 'user',
+                    }">
+                    {{ chat.message }}
+                </div>
+                }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="chat-input flex-centered">
+            <mat-form-field class="transparent-form-field spacer" appearance="fill">
+                <input matInput placeholder="Ask query here..." [formControl]="chatInput">
+            </mat-form-field>
+
+            <button mat-icon-button class="send-btn" (click)="emitMessage()">
+                <mat-icon>send</mat-icon>
+            </button>
+        </div>
+
+    </div>
+</div>

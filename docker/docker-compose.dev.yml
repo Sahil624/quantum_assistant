@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  webserver:
+    build:
+      context: ../server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG_SERVER=1
+    volumes:
+      - ../server:/app
+    command: python manage.py runserver 0.0.0.0:8000

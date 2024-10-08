@@ -1,0 +1,10 @@
+<div class="cell-content-container pad-16">
+    @if(cellDataResponse) {
+        @if(!cellDataResponse.interactive) {
+            <div class="cell-content">
+                <!-- <div class="span" [innerHTML]="content"></div> -->
+                 <app-latex-renderer [htmlContent]="cellDataResponse.content"></app-latex-renderer>
+            </div>
+        }
+    }
+</div>

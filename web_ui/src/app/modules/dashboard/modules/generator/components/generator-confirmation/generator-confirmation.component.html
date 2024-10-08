@@ -1,0 +1,34 @@
+<div class="generator-confirmation-container">
+
+    <div class="header pad-16-hr pad-8-top">
+        <h3>Add Your Course Details!</h3>
+    </div>
+
+    <div class="form-container margin-8">
+        <mat-dialog-content>
+            <p>What's your favorite animal?</p>
+
+            <form [formGroup]="courseForm" class="flex-column">
+                <mat-form-field appearance="outline">
+                    <mat-label>Title</mat-label>
+                    <input matInput formControlName="title" />
+
+                    @if (courseForm.get('title')?.invalid) {
+                        <mat-error>Title is required!</mat-error>
+                    }
+                </mat-form-field>
+
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Description (optional)</mat-label>
+                    <textarea matInput formControlName="description"></textarea>
+                </mat-form-field>
+            </form>
+        </mat-dialog-content>
+
+        <mat-dialog-actions>
+            <button mat-button mat-dialog-close>I need to do some changes</button>
+            <button mat-flat-button color="primary" (click)="generate()" cdkFocusInitial>Generate!</button>
+        </mat-dialog-actions>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="generator-container pad-16">
+    <div class="instruction">
+        <h2>Select the Outcomes from below Chapters to generate a course.</h2>
+    </div>
+
+    <div class="selection-container pad-8">
+
+        @if (generatorForm) {
+        <form [formGroup]="generatorForm">
+            <mat-accordion>
+                @for (unit of availableUnit; track unit) {
+                <mat-expansion-panel hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title> {{ unit }} </mat-panel-title>
+                        <!-- <mat-panel-description> This is a summary of the content </mat-panel-description> -->
+                    </mat-expansion-panel-header>
+                    @for (topic of getTopics(unit); track topic) {
+                    <section>
+                        <h4>{{ topic }}:</h4>
+
+                        @for (lo of availableCourses[unit][topic]['outcomes']; track lo) {
+                        <p>
+                            <mat-checkbox [formControlName]="lo['outcome'].slice(0, lo['outcome'].length - 1)">
+                                {{ lo['outcome'] }}
+                            </mat-checkbox>
+                        </p>
+                        }
+                    </section>
+                    <mat-divider></mat-divider>
+
+                    }
+
+                </mat-expansion-panel>
+                }
+            </mat-accordion>
+
+        </form>
+        }
+    </div>
+
+    <div class="flex-centered">
+
+    <button mat-flat-button (click)="generateCourse()" class="margin-16">
+        Generate My Course
+    </button>
+    </div>
+
+    <div class="fab-container floating-fab">
+        <button mat-fab extended color="secondary">
+            <mat-icon>smart_toy</mat-icon>
+            Need Help!
+        </button>
+    </div>
+</div>
