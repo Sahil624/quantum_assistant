@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, LearningObject
+from .models import AIInteraction, ActivityLog, AssignmentSubmission, Course, LearningObject
 
 class LearningObjectInline(admin.TabularInline):
     model = LearningObject
@@ -23,3 +23,25 @@ class LearningObjectAdmin(admin.ModelAdmin):
     list_filter = ('course',)
     search_fields = ('object_id', 'course__title')
     ordering = ('course', 'order')
+
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'learning_object', 'activity_type', 'timestamp')
+    list_filter = ('activity_type', 'timestamp', 'course')
+    search_fields = ('user__username', 'course__title', 'learning_object__object_id')
+    date_hierarchy = 'timestamp'
+
+@admin.register(AssignmentSubmission)
+class AssignmentSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'learning_object', 'submitted_at', 'score')
+    list_filter = ('submitted_at', 'score')
+    search_fields = ('user__username', 'learning_object__object_id')
+    date_hierarchy = 'submitted_at'
+
+@admin.register(AIInteraction)
+class AIInteractionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'learning_object', 'timestamp', 'helpfulness_rating')
+    list_filter = ('timestamp', 'helpfulness_rating', 'course')
+    search_fields = ('user__username', 'course__title', 'question', 'answer')
+    date_hierarchy = 'timestamp'

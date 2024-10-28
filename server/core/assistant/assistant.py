@@ -8,7 +8,8 @@ import os
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
 import torch
-import faiss
+
+# import faiss
 from pinecone import Pinecone
 from typing import List, Tuple, Optional
 from ..base.conversation import Conversation as BaseConversation
@@ -19,8 +20,9 @@ from ..models import Conversation, Message, AIResponse, PerformanceMetric, Syste
 logger = logging.getLogger(__name__)
 
 # Set OpenMP environment variable to ignore duplicate library error
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 
 class QuantumAssistantConversation(BaseConversation):
     response_tags = [
@@ -28,7 +30,11 @@ class QuantumAssistantConversation(BaseConversation):
         "insufficient_data",
         "unclear_notation",
         "image_reference",
-        "encourage_self_learning"
+        "encourage_self_learning",
+        "out_of_context",
+        "external_sources",
+        "internal_sources",
+        "sentiment_score"
     ]
 
     def __init__(self, user: type[AbstractUser], conversation_id: Optional[str] = None):
@@ -44,11 +50,15 @@ class QuantumAssistantConversation(BaseConversation):
         if conversation_id:
             conv_obj = Conversation.objects.get(id=conversation_id, user=self.user)
             # Update conversation here.
-            conv_obj.messages.values_list('content', 'message_type')
-            return conv_obj 
+            conv_obj.messages.values_list("content", "message_type")
+            return conv_obj
         else:
-            system_prompt = SystemPrompt.objects.filter(is_active=True, assistant_type='STUDY').first()
-            return Conversation.objects.create(system_prompt=system_prompt, user=self.user)
+            system_prompt = SystemPrompt.objects.filter(
+                is_active=True, assistant_type="STUDY"
+            ).first()
+            return Conversation.objects.create(
+                system_prompt=system_prompt, user=self.user
+            )
 
     def _initialize_database(self):
         if settings.DATABASE == "pinecone":
@@ -59,11 +69,17 @@ class QuantumAssistantConversation(BaseConversation):
         elif settings.DATABASE == "faiss":
             if os.path.exists(settings.FAISS_INDEX_FILE):
                 index = faiss.read_index(settings.FAISS_INDEX_FILE)
-                logger.info(f"Loaded FAISS index from file: {settings.FAISS_INDEX_FILE}")
+                logger.info(
+                    f"Loaded FAISS index from file: {settings.FAISS_INDEX_FILE}"
+                )
                 return index
             else:
-                logger.error("FAISS index file not found. Please run the indexing process first.")
-                raise FileNotFoundError("FAISS index file not found. Please run the indexing process first.")
+                logger.error(
+                    "FAISS index file not found. Please run the indexing process first."
+                )
+                raise FileNotFoundError(
+                    "FAISS index file not found. Please run the indexing process first."
+                )
         else:
             logger.error("Invalid database choice. Use 'pinecone' or 'faiss'.")
             raise ValueError("Invalid database choice. Use 'pinecone' or 'faiss'.")
@@ -75,53 +91,96 @@ class QuantumAssistantConversation(BaseConversation):
             logger.info(f"Loaded {len(chunks)} chunks from file.")
             return chunks
         else:
-            logger.error("Chunks file not found. Please run the indexing process first.")
-            raise FileNotFoundError("Chunks file not found. Please run the indexing process first.")
+            logger.error(
+                "Chunks file not found. Please run the indexing process first."
+            )
+            raise FileNotFoundError(
+                "Chunks file not found. Please run the indexing process first."
+            )
 
     def create_embedding(self, text: str) -> np.ndarray:
-        inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        inputs = self.tokenizer(
+            text, return_tensors="pt", padding=True, truncation=True, max_length=512
+        )
         with torch.no_grad():
             outputs = self.model(**inputs)
         return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
 
-    def search_similar_chunks(self, query_embedding: np.ndarray, top_k: int = 5) -> List[Tuple[str, float]]:
+    def search_similar_chunks(
+        self, query_embedding: np.ndarray, top_k: int = 5
+    ) -> List[Tuple[str, float]]:
         if settings.DATABASE == "pinecone":
-            results = self.index.query(vector=query_embedding.tolist(), top_k=top_k, include_metadata=True)
-            return [(match['metadata']['text'], float(match['score'])) for match in results['matches']]
+            results = self.index.query(
+                vector=query_embedding.tolist(), top_k=top_k, include_metadata=True
+            )
+            return [
+                (match["metadata"]["text"], float(match["score"]))
+                for match in results["matches"]
+            ]
         elif settings.DATABASE == "faiss":
             distances, indices = self.index.search(np.array([query_embedding]), top_k)
-            return [(self.chunks[int(i)], float(d)) for i, d in zip(indices[0], distances[0])]
+            return [
+                (self.chunks[int(i)], float(d))
+                for i, d in zip(indices[0], distances[0])
+            ]
 
     @transaction.atomic
-    def process_query(self, user_query: str) -> str:
+    def process_query(self, user_query: str, include_external_data=False) -> str:
         iterations = settings.MAX_FOLLOW_UP_LIMIT
         response = None
 
         extracted_content = settings.TOP_K
         internal_query = user_query
+        messages = []
+
         while iterations:
             logger.info(f"Processing iteration {iterations}")
-            extracted_content += ((settings.MAX_FOLLOW_UP_LIMIT - iterations) * 5)
+            extracted_content += (settings.MAX_FOLLOW_UP_LIMIT - iterations) * 5
             query_embedding = self.create_embedding(internal_query)
-            relevant_chunks = self.search_similar_chunks(query_embedding, extracted_content)
-            system_prompt, context = self.prepare_system_prompt(internal_query, relevant_chunks)
-            internal_query = self.prepare_user_prompt(query=user_query, context=context,
-                                                      follow_up_limit_remaining=iterations)
+            relevant_chunks = self.search_similar_chunks(
+                query_embedding, extracted_content
+            )
+            system_prompt, context = self.prepare_system_prompt(
+                internal_query, relevant_chunks
+            )
+
+            internal_query, tags = self.prepare_user_prompt(
+                query=user_query,
+                context=context,
+                follow_up_limit_remaining=iterations,
+                external_source_allowed=include_external_data,
+            )
 
             logger.debug(f"System prompt: {system_prompt}")
             logger.debug(f"Internal query: {internal_query}")
 
-            self.add_message("user", internal_query)
+            user_message = self.add_message("user", internal_query, tags)
+
+            # If first iteration, save as original message.
+            if iterations == settings.MAX_FOLLOW_UP_LIMIT:
+                user_message.is_original_user_query = True
+                user_message.save()
+
+            messages.append(user_message)
 
             response, tags = self.send_to_claude_api(system_prompt)
 
-            assistant_message = self.add_message("assistant", response)
+            assistant_message = self.add_message("assistant", response, tags)
+            messages.append(assistant_message)
 
-            if tags.get('insufficient_data'):
+            if tags.get("insufficient_data"):
                 logger.info("Insufficient data detected")
-                internal_query = user_query + ' \n ' + tags.get('insufficient_data')
-            else:
+                internal_query = user_query + " \n " + tags.get("insufficient_data")
+            elif tags.get("out_of_context"):
+                assistant_message.is_out_of_context_message = True
+                assistant_message.save()
+                break
+            elif tags.get('concept_explanation'):
                 assistant_message.is_answer = True
+
+                if tags.get('sentiment_score'):
+                    assistant_message.sentiment = tags['sentiment_score']
+                    
                 assistant_message.save()
                 break
 
@@ -131,13 +190,14 @@ class QuantumAssistantConversation(BaseConversation):
         PerformanceMetric.objects.create(
             conversation=self.conversation_obj,
             metric_name="iterations",
-            metric_value=settings.MAX_FOLLOW_UP_LIMIT - iterations
+            metric_value=settings.MAX_FOLLOW_UP_LIMIT - iterations,
         )
 
-        return tags
+        return messages
 
     def prepare_user_prompt(self, query: str, context: str, **kwargs) -> str:
-        return f'''                
+        follow_ups = kwargs.get("follow_up_limit_remaining") - 1
+        ai_query = f"""                
             <input>
             <user_query>
                 {query}
@@ -148,12 +208,26 @@ class QuantumAssistantConversation(BaseConversation):
             </context>
             
             <follow_up_limit_remaining>
-                {kwargs.get('follow_up_limit_remaining')-1}
+                {follow_ups}
             </follow_up_limit_remaining>
-            </input>
-        '''
 
-    def prepare_system_prompt(self, query: str, relevant_chunks: List[Tuple[str, float]]) -> Tuple[str, str]:
+            <external_source_allowed>
+                {bool(kwargs.get('external_source_allowed', False))}
+            </external_source_allowed>
+            </input>
+        """
+
+        tags = {
+            "user_query": query,
+            "context": context,
+            "follow_up_limit_remaining": follow_ups,
+            "external_source_allowed": bool(kwargs.get('external_source_allowed', False))
+        }
+        return ai_query, tags
+
+    def prepare_system_prompt(
+        self, query: str, relevant_chunks: List[Tuple[str, float]]
+    ) -> Tuple[str, str]:
         context = "\n".join([f"- {chunk}" for chunk, _ in relevant_chunks])
 
         system_prompt = f"""
@@ -161,21 +235,32 @@ class QuantumAssistantConversation(BaseConversation):
         You are a student assistant AI specializing in quantum computing and cryptography. Your primary role is to explain concepts based on the information provided in the context below. This context is extracted from a larger dataset based on relevance to the user's query, so it may contain fragments from different sources.
 
         Guidelines for your responses:
-        1. Explain concepts using ONLY the information provided in the context.
+        1. Explain concepts using ONLY the information provided in the context no information should be consumed outside context for answering the query unless point 8 is satisfied.
         2. If the information is insufficient, respond with <INSUFFICIENT_DATA> tag and suggest what additional query parameters might help retrieve more relevant information.
         3. When using specific parts of the context, indicate which part you're referencing (e.g., "According to the learning objective mentioned...").
         4. For unclear mathematical notations or image references, respond with <NOTATION_UNCLEAR> or <IMAGE_REFERENCE> tag respectively, and explain what information is missing or unclear.
-        5. Focus on explaining concepts rather than providing direct answers. If a user asks for an answer, respond with:
+        5. Unless <strict_mode> is false in system prompt, focus on explaining concepts rather than providing direct answers. If a user asks for an answer, respond with:
            "As a learning assistant, I believe it would be more beneficial for you to work through this problem yourself. Would you like me to explain the relevant concepts to help you arrive at the answer on your own?"
            Only if the user insists after this explanation should you provide a direct answer based on the context.
-        6. Do not expand on concepts beyond what's directly stated in the context.
-        7. Max followup questions limit is {settings.MAX_FOLLOW_UP_LIMIT}. When this limit is reached, answer the query anyway by combining the data provided in all the iterations and data from external sources (like articles, blogs, research papers etc.) as well. If external sources are used, cite link/name of those sources in response (This is very important).
-        8. If query is answered from context, do tell the user about it (Where you concluded the response from) in a short summary.
+        6. Do not expand on concepts beyond what's directly stated in the context unless.
+        7. Max followup questions limit is {settings.MAX_FOLLOW_UP_LIMIT}. When this limit has reached 0 and <external_source_allowed> is false or not sent, respond with <out_of_context> as true. User will be informed for that.
+        8. If <external_source_allowed> is sent true in query by user, answer the query anyway by combining the data provided in all the iterations and data from external sources (like articles, blogs, research papers etc.) as well. If external sources are used, cite link/name of those sources in response (This is very important) and send <external_sources> tag.
+        9. If query is answered from context, do tell the user about it (Where you concluded the response from) in a short summary.
 
         <output>
         <concept_explanation>
-        [Explanation of concept based on the context]. Only send when either course is explained from provided data or max followup limit is reached. Do not mention about context. User does not know about context, it is sent by server. Instead use the term "Curriculum"
+        [Explanation of concept based on the context]. Only send when either course is explained from provided data or external data. Do not mention about context. User does not know about context, it is sent by server. Instead use the term "Curriculum"
         </concept_explanation>
+
+        <internal_sources>
+            If context provided were used to answer query, cite exact part/parts of context which answer the query.
+            - This was a sentence as provided in context which contributed to answer the query
+            - This was also a part of content which contributed to answer the query
+        </internal_sources>
+
+        <sentiment_score>
+            Give a score of correctness of the answer between 0 to 1. Higher score being better.
+        </sentiment_score>
 
         <insufficient_data>
         To provide a more complete explanation, we might need additional information about [suggested query parameters]. Give me required information in form of followup questions, I will index those question in database and send updated info.Only send this tag when some extra data is needed. Only send list of question nothing else.
@@ -196,52 +281,67 @@ class QuantumAssistantConversation(BaseConversation):
         <encourage_self_learning>
         As a learning assistant, I believe it would be more beneficial for you to work through this problem yourself. Would you like me to explain the relevant concepts to help you arrive at the answer on your own?
         </encourage_self_learning>
+
+        <out_of_context>
+            Sent True, when the provided context cannot answer the query even after all the retry. Otherwise, do not send.
+        </out_of_context>
+
+        <external_sources>
+            If external sources were referred other than context, then send the details of those sources here.
+        </external_sources>
         </output>
+
+        <strict_mode>
+        false
+        </strict_mode>
 
         Remember, your goal is to assist students in understanding quantum computing concepts by explaining information from the given context, not to demonstrate broader knowledge of the field.
         </system>
         """
         return system_prompt, context
 
-    def add_message(self, role: str, content: str) -> Message:
+    def add_message(self, role: str, content: str, tags: dict) -> Message:
         super().add_message(role, content)
         return Message.objects.create(
             conversation=self.conversation_obj,
             content=content,
-            message_type=role.upper()
+            message_type=role.upper(),
+            entities=tags,
         )
 
     def send_to_claude_api(self, system_prompt) -> Tuple[str, dict]:
-        response, tags = super().send_to_claude_api(system_prompt)    
-        
+        response, tags = super().send_to_claude_api(system_prompt)
+
         # Save the AI response
         AIResponse.objects.create(
             message=self.conversation_obj.messages.last(),
-            ai_type='CLAUDE',
+            ai_type="CLAUDE",
             attempt_number=1,
             response_content=response,
-            is_final_answer=True
+            is_final_answer=True,
         )
-        
+
         return response, tags
 
     @classmethod
     def load_from_db(cls, conversation_id: str):
         return cls(conversation_id)
 
+
 def main():
     conversation = QuantumAssistantConversation()
     while True:
         user_query = input("Enter your query (or 'quit' to exit): ")
-        if user_query.lower() == 'quit':
+        if user_query.lower() == "quit":
             break
 
         if not user_query:
-            logger.warning('Invalid Query')
+            logger.warning("Invalid Query")
             continue
-        
+
         response = conversation.process_query(user_query)
         print("\n\nAssistant:", response)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

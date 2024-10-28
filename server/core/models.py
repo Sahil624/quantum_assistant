@@ -1,3 +1,4 @@
+from typing import Iterable
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -29,14 +30,12 @@ class Conversation(models.Model):
     title = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    # New fields
     context = models.TextField(blank=True, help_text="Any additional context for the conversation")
     tags = models.JSONField(null=True, blank=True, help_text="Custom tags for categorizing conversations")
     user_feedback = models.IntegerField(null=True, blank=True, help_text="User rating for the conversation (e.g., 1-5)")
     
     def __str__(self):
-        return f"{self.title} - {self.user.username} with {self.system_prompt}"
+        return f"{self.title[:20]} - {self.user.username} with {self.system_prompt}"
 
 class Message(models.Model):
     MESSAGE_TYPES = [
@@ -49,8 +48,8 @@ class Message(models.Model):
     message_type = models.CharField(max_length=10, choices=MESSAGE_TYPES)
     timestamp = models.DateTimeField(auto_now_add=True)
     is_answer = models.BooleanField(default=False)
-    
-    # New fields
+    is_original_user_query = models.BooleanField(default=False)
+    is_out_of_context_message = models.BooleanField(default=False)
     tokens = models.IntegerField(null=True, help_text="Number of tokens in the message")
     sentiment = models.FloatField(null=True, help_text="Sentiment score of the message")
     entities = models.JSONField(null=True, blank=True, help_text="Named entities extracted from the message")

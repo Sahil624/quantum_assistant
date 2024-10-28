@@ -7,6 +7,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RecordActivityRequest, ViewContentDetails } from '../../../../../../../../helpers/services/activity/activity.interface';
+import { ActivityType } from '../../../../../../../../helpers/services/activity/activity.enums';
+import { ActivityService } from '../../../../../../../../helpers/services/activity/activity.service';
 
 @Component({
   selector: 'app-progress-bar',
@@ -28,7 +31,8 @@ export class ProgressBarComponent {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private activityService: ActivityService
   ) {
     this.activatedRoute.params.subscribe((param) => {
       this.activeCell = param['cellID']
@@ -36,7 +40,23 @@ export class ProgressBarComponent {
   }
 
   navigateToCell(cell: LearningObject) {
+    this.saveViewContentActivity(cell.object_id);
     this.router.navigateByUrl(`/dashboard/courses/learn/${this.course.id}/${cell.object_id}`);
+  }
+
+  saveViewContentActivity(cellID: string) {
+    const detail: ViewContentDetails = {
+      viewed_cell: cellID,
+      movement: 'skip'
+    }
+
+    const request: RecordActivityRequest = {
+      activity_type: ActivityType.ViewContent,
+      course: this.course.id,
+      details: detail
+    };
+
+    this.activityService.saveActivity(request).subscribe();
   }
 
   get completedPercent() {

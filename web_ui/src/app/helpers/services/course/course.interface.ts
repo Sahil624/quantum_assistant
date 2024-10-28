@@ -50,6 +50,7 @@ export interface CellDataResponse {
   interactive: boolean
   content: string
   redirect_link: string
+  quiz_cell: string
 }
 
 export interface UpdateLOStatusRequest {
@@ -62,4 +63,11 @@ export interface CreateCourseRequest {
   title: string
   learning_object_ids: string[]
   description?: string;
+}
+
+export interface MetaDataI {
+  [key:string]: {
+    cell_estimated_time: string
+    cell_prereqs: string[]
+  }
 }

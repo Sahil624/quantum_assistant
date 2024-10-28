@@ -3,12 +3,14 @@ import { CourseService } from '../../../../../../../../helpers/services/course/c
 import { CellDataResponse } from '../../../../../../../../helpers/services/course/course.interface';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { LatexRendererComponent } from '../latex-renderer/latex-renderer.component';
+import { InteractiveRendererComponent } from '../interactive-renderer/interactive-renderer.component';
 
 @Component({
   selector: 'app-cell-content',
   standalone: true,
   imports: [
-    LatexRendererComponent
+    LatexRendererComponent,
+    InteractiveRendererComponent
   ],
   templateUrl: './cell-content.component.html',
   styleUrl: './cell-content.component.scss'

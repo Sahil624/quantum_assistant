@@ -1,5 +1,6 @@
 
 import json
+import logging
 from .metastore import set_cell_metadata, set_notebook_metadata
 
 
@@ -15,4 +16,7 @@ def load_lo_metadata():
 
 
 
-load_lo_metadata()
+try:
+    load_lo_metadata()
+except FileNotFoundError:
+    logging.error("Some metadata json file not found. System will not work correctly.")

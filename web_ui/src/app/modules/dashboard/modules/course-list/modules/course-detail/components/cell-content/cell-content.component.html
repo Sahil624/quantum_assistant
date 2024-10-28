@@ -1,10 +1,12 @@
 <div class="cell-content-container pad-16">
-    @if(cellDataResponse) {
-        @if(!cellDataResponse.interactive) {
-            <div class="cell-content">
-                <!-- <div class="span" [innerHTML]="content"></div> -->
-                 <app-latex-renderer [htmlContent]="cellDataResponse.content"></app-latex-renderer>
-            </div>
+    <div class="cell-content">
+        @if(cellDataResponse) {
+        @if(cellDataResponse.interactive) {
+        <app-interactive-renderer [interactiveUrl]="cellDataResponse.redirect_link"></app-interactive-renderer>
+        } @else {
+        <app-latex-renderer [htmlContent]="cellDataResponse.content"
+            [quizCell]="cellDataResponse.quiz_cell"></app-latex-renderer>
         }
-    }
+        }
+    </div>
 </div>

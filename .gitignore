@@ -165,4 +165,5 @@ cython_debug/
 faiss_index.bin
 text_chunks.json
 server/static/notebooks/*.html
-voila
+voila/out/
+tools/

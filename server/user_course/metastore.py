@@ -9,8 +9,14 @@ _NOTEBOOK_METADATA = {}
 def set_cell_metadata(data: dict):
     for _, cells in data.items():
         for cell in cells:
-            meta_data = cell['metadata']['cell_details']
-            _CELL_METADATA[meta_data['cell_ID']] = meta_data
+            try:
+                if cell.get('output_type') or not cell.get('source'):
+                    # Output cells can be ignored
+                    continue
+                meta_data = cell['metadata']['cell_details']
+                _CELL_METADATA[meta_data['cell_ID']] = meta_data
+            except KeyError as e:
+                logging.error(f'Some field not found for cell "{cell}". Err "{e}"')
 
 def get_cell_meta(cell_id: str, raise_exception = True):
     try:
@@ -19,9 +25,11 @@ def get_cell_meta(cell_id: str, raise_exception = True):
         err_str = f"Cell ID {cell_id} not found in META_DATA"
         logging.error(err_str)
         if raise_exception:
-            raise CellMetaDataNotFoundError(err_str)
+            raise CellMetaDataNotFoundError(message=err_str)
     return None
 
+def get_all_cells():
+    return _CELL_METADATA
 
 def set_notebook_metadata(data: dict):
     for title, meta_data in data.items():

@@ -1,0 +1,30 @@
+$light-dark: lighten($color: #000000, $amount: 60);
+
+.generator-container {
+    .selection-container {
+        .selection-info {
+            font-size: 0.8rem;
+            font-weight: normal;
+            font-style: italic;
+            padding: 4px 8px;
+            color: $light-dark;
+        }
+    }
+
+    .estimated-time {
+        justify-content: space-between;
+        align-items: center;
+
+        .hint {
+            .sub-text {
+                font-size: 0.8rem;
+                color: $light-dark;
+                font-style: italic;
+            }
+        }
+        
+        .estimated-form-field {
+            min-width: 30%;
+        }
+    }
+}

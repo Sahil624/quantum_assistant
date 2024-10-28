@@ -21,8 +21,8 @@ class ConversationAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'conversation', 'message_type', 'is_answer', 'timestamp')
-    list_filter = ('message_type', 'is_answer', 'timestamp')
+    list_display = ('id', 'conversation', 'message_type', 'is_original_user_query', 'is_out_of_context_message', 'is_answer', 'timestamp')
+    list_filter = ('message_type', 'is_answer', 'is_original_user_query', 'timestamp')
     search_fields = ('content', 'conversation__title')
     ordering = ('-timestamp',)
     raw_id_fields = ('conversation',)

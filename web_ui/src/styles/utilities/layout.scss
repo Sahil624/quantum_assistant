@@ -18,6 +18,17 @@
     @extend .pad-8-right;
 }
 
+.margin-8-left {
+    margin-left: 8px;
+}
+.margin-8-right {
+    margin-right: 8px;
+}
+
+.margin-8 {
+    margin: 8px;
+}
+
 .pad-16-top {
     padding-top: 16px;
 }
@@ -43,17 +54,10 @@
     @extend .pad-16-right;
 }
 
+.margin-16-right {
+    margin-right: 16px;
+}
+
 .margin-16 {
     margin: 16px;
-}
-
-.margin-8-left {
-    margin-left: 8px;
-}
-.margin-8-right {
-    margin-right: 8px;
-}
-
-.margin-8 {
-    margin: 8px;
 }
