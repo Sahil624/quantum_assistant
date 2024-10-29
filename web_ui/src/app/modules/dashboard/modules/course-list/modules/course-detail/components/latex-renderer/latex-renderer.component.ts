@@ -15,12 +15,18 @@ import { CourseService } from '../../../../../../../../helpers/services/course/c
   }
 
   @if(quizCell) {
-    <button mat-flat-button (click)="downloadFile()">Download Quiz Notebook!</button>
+    <button mat-flat-button class="download-final-quiz-btn" (click)="downloadFile()">Download Quiz Notebook!</button>
   }
   `,
   styles: `
   iframe {
-    height: 80vh
+    height: 80vh;
+  }
+
+  .download-final-quiz-btn {
+    position: absolute;
+    left: 150px;
+    top: 300px;
   }
   `
 })

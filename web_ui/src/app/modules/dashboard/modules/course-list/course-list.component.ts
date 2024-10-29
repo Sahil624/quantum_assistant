@@ -20,6 +20,7 @@ import { RouterModule } from '@angular/router';
 })
 export class CourseListComponent {
   myCourses!: MyCourseResponse
+  contentLoaded = false;
 
   constructor(
     private courseService: CourseService
@@ -30,6 +31,7 @@ export class CourseListComponent {
   getMyCourses() {
     this.courseService.getMyCourses().subscribe((res) => {
       this.myCourses = res;
+      this.contentLoaded = true;
     })
   }
 

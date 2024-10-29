@@ -97,15 +97,21 @@ export class CourseDetailComponent {
     const currentLOIdx = this.courseDetail.learning_objects.findIndex(x => x.object_id === this.cellID);
 
     const nextIndex = currentLOIdx + 1;
+    let lastLO = false;
 
-    if (nextIndex > this.courseDetail.learning_objects.length - 1) {
+    if (currentLOIdx == this.courseDetail.learning_objects.length - 1) {
+      lastLO = true;
+    } else if (nextIndex > this.courseDetail.learning_objects.length - 1) {
       return
     }
 
-    this.saveViewContentActivity(this.courseDetail.learning_objects[nextIndex].object_id, 1);
-    if (this.courseDetail.learning_objects[currentLOIdx].completed_on != null) {
-      this.navigateToCellID(this.courseDetail.learning_objects[nextIndex].object_id);
-      return;
+    if (!lastLO) {
+      this.saveViewContentActivity(this.courseDetail.learning_objects[nextIndex].object_id, 1);
+
+      if (this.courseDetail.learning_objects[currentLOIdx].completed_on != null) {
+        this.navigateToCellID(this.courseDetail.learning_objects[nextIndex].object_id);
+        return;
+      }
     }
 
     const now = new Date().toISOString().split('.')[0] + "Z";
@@ -114,19 +120,27 @@ export class CourseDetailComponent {
       {
         id: this.courseDetail.learning_objects[currentLOIdx].id,
         completed_on: now
-      },
-      {
-        id: this.courseDetail.learning_objects[nextIndex].id,
-        started_on: now
       }
     ];
+
+    if (!lastLO) {
+      updateRequest.push(
+        {
+          id: this.courseDetail.learning_objects[nextIndex].id,
+          started_on: now
+        }
+      );
+    }
 
     this.courseService.updateLOStatus(updateRequest).subscribe((_) => {
       this.snackbar.open(`Congratulations! ${this.courseDetail.learning_objects[currentLOIdx].object_id} completed.`)
 
-      this.navigateToCellID(this.courseDetail.learning_objects[nextIndex].object_id);
       this.courseDetail.learning_objects[currentLOIdx].completed_on = now;
-      this.courseDetail.learning_objects[nextIndex].started_on = now;
+
+      if (!lastLO) {
+        this.navigateToCellID(this.courseDetail.learning_objects[nextIndex].object_id);
+        this.courseDetail.learning_objects[nextIndex].started_on = now;
+      }
     })
   }
 

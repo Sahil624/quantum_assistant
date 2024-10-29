@@ -10,7 +10,7 @@
         <mat-card appearance="outlined" class="course-card margin-8 pad-8">
             <mat-card-header>
                 <mat-card-title> {{ course.title }} </mat-card-title>
-                <mat-card-subtitle>{{ course.description }}</mat-card-subtitle>
+                <!-- <mat-card-subtitle>{{ course.description }}</mat-card-subtitle> -->
             </mat-card-header>
 
 
@@ -38,6 +38,12 @@
                 </button>
             </mat-card-actions>
         </mat-card>
+        }
+
+        @if(contentLoaded && (myCourses.length) == 0) {
+            <div class="flex-centered">
+                <h3>No Courses Generated Yet!</h3>
+            </div>
         }
     </div>
 </div>

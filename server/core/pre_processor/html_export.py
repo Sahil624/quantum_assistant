@@ -68,8 +68,10 @@ class NotebookConverter:
 
     def convert_notebook(self, notebook_path: str):
         """Convert a single notebook to HTML files"""
+
         try:
             notebook_path = Path(notebook_path)
+            self.copy_dependencies(notebook_path)
             logger.info(f"Processing {notebook_path}")
             
             # Read notebook
