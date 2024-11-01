@@ -1,0 +1,34 @@
+<mat-drawer #drawer class="height-max-vh side-menu-drawer" [class.collapsed]="collapsed" mode="over" opened="true" >
+    <!-- (mouseenter)="collapsed = false" (mouseleave)="collapsed = true" -->
+
+    <div class="branding margin-16">
+        <!-- <a href="/"> -->
+        @if(collapsed) {
+        Q
+        }
+        @else {
+        QUINTET
+        }
+        <!-- </a> -->
+    </div>
+
+    <div class="menu-items flex-column">
+        <div class="upper-items">
+            <button class="item-button margin-8" mat-icon-button routerLink="courses" matTooltip="My Courses">
+                <mat-icon>format_list_bulleted</mat-icon>
+            </button>
+
+            <button class="item-button margin-8" mat-icon-button routerLink="new" matTooltip="New Course">
+                <mat-icon>draw</mat-icon>
+            </button>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="lower-items flex-centered flex-column">
+            <button class="item-button margin-8" mat-icon-button (click)="authService.logout()" matTooltip="Logout">
+                <mat-icon>logout</mat-icon>
+            </button>
+        </div>
+    </div>
+</mat-drawer>

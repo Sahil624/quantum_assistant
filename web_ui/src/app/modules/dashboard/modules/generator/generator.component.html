@@ -1,0 +1,66 @@
+<div class="generator-container pad-16">
+    <div class="instruction">
+        <h2>Select the Outcomes from below Chapters to generate a course.</h2>
+        <p>Estimated time to complete this course <b>{{ estimatedTime }} minutes</b>. </p>
+    </div>
+    <div class="selection-container pad-8">
+        <mat-accordion>
+            @for (unit of availableUnit; track unit) {
+            <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{ unit }}
+
+                        @if (tree.selectedLOs) {
+                        <div class="selection-info">
+                            {{ tree.selectedLOs }} Learning Objects Selected
+                        </div>
+                        }
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-lo-tree #tree [availableCourses]="availableCourses" [unit]="unit"></app-lo-tree>
+            </mat-expansion-panel>
+            }
+        </mat-accordion>
+    </div>
+
+
+    <div class="display-flex estimated-time pad-8">
+        <div class="hint pad-8">
+            Not entering any value will generate course without any time constraint: <br>
+
+            <div class="sub-text">
+                This tool can generate optimize course if the estimated time exceeds your time limit
+            </div>
+        </div>
+
+        <mat-form-field appearance="outline" class="estimated-form-field">
+            <mat-label>Estimated Time (in mins)</mat-label>
+            <input matInput placeholder="Placeholder" [formControl]="availableTimeControl">
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>Optional</mat-hint>
+        </mat-form-field>
+    </div>
+
+    <div class="flex-centered">
+        <button mat-flat-button (click)="generateCourse()" class="margin-16">
+            @if (availableTimeControl.value && availableTimeControl.value < estimatedTime) 
+            {
+                Optimize & 
+            }
+            
+            Generate My Course
+        </button>
+
+        @if(inProgress) {
+            <mat-spinner diameter="30" class="margin-16-right"></mat-spinner>
+        }
+    </div>
+
+    <!-- <div class="fab-container floating-fab">
+        <button mat-fab extended color="secondary" (click)="openAssistantDialog()">
+            <mat-icon>smart_toy</mat-icon>
+            Need Help!
+        </button>
+    </div> -->
+</div>

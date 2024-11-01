@@ -1,0 +1,77 @@
+<div class="chat-conversation-container pad-8">
+    <div class="header display-flex">
+        <div class="flex-centered">
+            <mat-icon class="logo flex-centered margin-8-right">smart_toy</mat-icon>
+
+            <div class="details margin-8-left">
+                <p class="title">{{ title }}</p>
+                <p class="meta">{{ description }}</p>
+            </div>
+        </div>
+
+        <button mat-icon-button class="close" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <div class="conversation-container">
+        <div class="chat-history flex-column pad-8" #chatScroll>
+            @for (chat of conversation; track chat) {
+            <div class="message-bubble pad-8 margin-8" [ngClass]="{
+                        'system-bubble': chat.message_type == MessageType.ASSISTANT,
+                        'user-bubble': chat.message_type == MessageType.USER,
+                    }">
+                @switch(chat.message_type) {
+                @case(MessageType.USER) {
+                {{ chat.entities['user_query'] }}
+                }
+
+                @case(MessageType.ASSISTANT) {
+                @if( chat.entities['concept_explanation']) {
+                {{ chat.entities['concept_explanation'] }}
+                }
+                }
+                }
+
+                @if(chat.entities['external_sources'] || chat.entities['external_source_allowed']) {
+                <div class="externals-source-indicator mat-elevation-z4"
+                    [matTooltip]="chat.entities['external_sources'] || externalHint">
+                    E
+                </div>
+                }
+            </div>
+            }
+
+            @if( showExternalDataConfirmation ) {
+            <div class="external-source-confirmation mat-elevation-z5">
+                <p>This question seems to be out of our course's content. Do you want me to search answer from external
+                    sources?</p>
+                <button mat-raised-button (click)="searchExternalSources()">
+                    @if(thinking) {
+                    <mat-spinner diameter="30" class="margin-16-right"></mat-spinner>
+                    } @else {
+                    Yes
+                    }
+                </button>
+            </div>
+            }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="chat-input flex-centered">
+            <mat-form-field class="transparent-form-field spacer" appearance="fill">
+                <input matInput placeholder="Ask query here..." [formControl]="chatInput" (keyup.enter)="emitMessage()">
+            </mat-form-field>
+
+            @if(thinking) {
+            <mat-spinner diameter="30" class="margin-16-right"></mat-spinner>
+            } @else {
+            <button mat-icon-button class="send-btn" (click)="emitMessage()">
+                <mat-icon>send</mat-icon>
+            </button>
+            }
+        </div>
+
+    </div>
+</div>

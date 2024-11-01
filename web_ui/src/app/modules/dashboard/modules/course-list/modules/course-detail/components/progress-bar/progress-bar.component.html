@@ -1,0 +1,52 @@
+<div class="progress-bar-container">
+    <mat-drawer mode="side" opened position="end" class="progress-drawer height-max-vh">
+
+        <div class="header pad-16">
+            <div class="title">
+                <h3>{{ course.title }}</h3>
+            </div>
+
+            <div class="progress flex-centered">
+                <mat-progress-bar mode="determinate" [value]="completedPercent"></mat-progress-bar>
+                <div class="number margin-8-left"> {{ completedPercent }}%</div>
+            </div>
+        </div>
+
+
+        <div class="los">
+            <mat-list>
+                <div mat-subheader>Learning Objects</div>
+                @for (lo of course.learning_objects; track lo) {
+                <mat-list-item class="list-item" [class.active]="lo.object_id === activeCell"
+                    [class.in-progress]="lo.started_on != null && lo.completed_on == null"
+                    [class.completed]="lo.completed_on != null" (click)="navigateToCell(lo)">
+
+                    @if (lo.completed_on != null) {
+                    <mat-icon matListItemIcon class="completed-indicator">task_alt</mat-icon>
+                    } @else {
+                    <mat-icon matListItemIcon class="active-indicator">schedule</mat-icon>
+                    }
+
+                    <div matListItemTitle [matTooltip]="lo.metadata?.cell_title || lo.object_id">{{lo.metadata?.cell_title || lo.object_id}}</div>
+
+                    <div class="meta-text">
+
+                        @if(lo.metadata) {
+                            Estimated Time {{ lo.metadata.cell_estimated_time }} mins
+                        }
+
+                        @if(lo.completed_on != null) {
+                        |
+
+                        <span>Completed on {{ lo.completed_on | date }}</span>
+                        }
+                    </div>
+                    <!-- <div matListItemLine>{{note.updated | date}}</div> -->
+                </mat-list-item>
+                }
+            </mat-list>
+
+        </div>
+
+    </mat-drawer>
+</div>

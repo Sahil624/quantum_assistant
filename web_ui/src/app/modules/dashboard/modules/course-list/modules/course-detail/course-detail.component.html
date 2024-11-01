@@ -1,0 +1,42 @@
+@if(courseDetail) {
+<div class="course-detail-container pad-8">
+        <mat-drawer-content class="progress-content">
+
+                <div class="detail-content-container">
+                        <mat-toolbar>
+                                <button mat-stroked-button extended class="previous navigation-btn" (click)="previous()">
+                                        <mat-icon>arrow_back</mat-icon>
+                                        Previous
+                                </button>
+                                
+                                <span class="pad-8">
+                                        {{  activeLo.metadata?.cell_title }}
+                                </span>
+
+                                <span class="spacer"></span>
+
+                                <button mat-stroked-button class="next navigation-btn" (click)="next()">
+                                        <mat-icon>arrow_forward</mat-icon>
+                                        Next
+                                </button>
+                        </mat-toolbar>
+
+
+                        @if(cellID) {
+                        <app-cell-content [cellID]="cellID"></app-cell-content>
+                        }
+                </div>
+
+        </mat-drawer-content>
+
+        <app-progress-bar [course]="courseDetail"></app-progress-bar>
+
+
+    <div class="fab-container floating-fab">
+        <button mat-fab extended color="secondary" (click)="openAssistantDialog()">
+            <mat-icon>smart_toy</mat-icon>
+            Need Help!
+        </button>
+    </div>
+</div>
+}

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  webserver:
+    build:
+      context: ../server
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=yourproject.settings.production
+    volumes:
+      - ../server:/app
+    command: gunicorn yourproject.wsgi:application --bind 0.0.0.0:8000
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:

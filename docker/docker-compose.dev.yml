@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  webserver:
+    build:
+      context: ../server
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG_SERVER=1
+    # volumes:
+    #   - .:/app
+    #   - app-volume:/app
+
+  # voila:
+  #   build:
+  #     context: ../voila
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8866:8866"
+  #   environment:
+  #     - DEBUG_SERVER=1
+  #   volumes:
+  #     - ../server:/app
+  #     - app-volume:/app
+
+  # nginx:
+  #   build:
+  #     context: ../nginx
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - app-volume:/app
+
+volumes:
+     app-volume: 

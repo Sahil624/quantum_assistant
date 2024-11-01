@@ -1,0 +1,24 @@
+<div class="login-form-container">
+
+    <form class="flex-column" [formGroup]="loginForm" (ngSubmit)="login()">
+        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Username</mat-label>
+        <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input formControlName="username" type="string" matInput />
+        </mat-form-field>
+
+        <!-- password -->
+        <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Password</mat-label>
+        <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input matInput formControlName="password" type="password" />
+        </mat-form-field>
+
+        <!-- <div class="d-flex align-items-center m-b-12">
+            <mat-checkbox color="primary">Remember this Device</mat-checkbox>
+            <a class="text-primary f-w-600 text-decoration-none m-l-auto f-s-14">Forgot Password ?</a>
+        </div> -->
+        <button mat-flat-button color="primary" class="w-100" type="submit">
+            Sign In
+        </button>
+        <!-- input -->
+    </form>
+</div>

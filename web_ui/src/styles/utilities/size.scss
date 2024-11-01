@@ -1,0 +1,10 @@
+$full-height: calc(100vh - 16px);
+
+.height-vh {
+    min-height: $full-height;
+}
+
+.height-max-vh {
+    max-height: $full-height;
+    min-height: $full-height;
+}

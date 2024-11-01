@@ -1,0 +1,8 @@
+ipywidgets==8.1.5
+ipython==8.27.0
+ipykernel==6.29.5
+voila==0.5.7
+qiskit==0.45.2
+qiskit-aer==0.14.2
+matplotlib
+qutip
