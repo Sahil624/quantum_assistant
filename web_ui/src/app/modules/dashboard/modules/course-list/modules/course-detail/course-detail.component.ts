@@ -14,6 +14,7 @@ import { DialogPosition, MatDialog } from '@angular/material/dialog';
 import { RecordActivityRequest, ViewContentDetails } from '../../../../../../helpers/services/activity/activity.interface';
 import { ActivityType } from '../../../../../../helpers/services/activity/activity.enums';
 import { ActivityService } from '../../../../../../helpers/services/activity/activity.service';
+import { ModuleNameFormatterPipe } from '../../../../../../helpers/pipes/module-name-formatter/module-name-formatter.pipe';
 
 @Component({
   selector: 'app-course-detail',
@@ -26,7 +27,8 @@ import { ActivityService } from '../../../../../../helpers/services/activity/act
     MatToolbarModule,
     MatIconModule,
     MatSnackBarModule,
-    AiAssistantComponent
+    AiAssistantComponent,
+    ModuleNameFormatterPipe
   ],
   templateUrl: './course-detail.component.html',
   styleUrl: './course-detail.component.scss'

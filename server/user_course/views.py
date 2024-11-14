@@ -151,7 +151,7 @@ class CellData(APIView):
             raise NotFound("Learning Outcome not found")
 
     def redirect_to_voila(self, cell_id, anchor=None):
-        voila_host = "http://localhost:8866/"
+        voila_host = os.getenv('VOILA_HOST', "http://localhost:8866/")
         voila_url = voila_host + f"voila/render/out/{cell_id}.ipynb"
 
         if anchor:
@@ -199,7 +199,7 @@ class CellData(APIView):
                 return self.redirect_to_voila("m12", cell_id)
             elif "-final" in cell_id.lower():
                 return self.check_final_quiz(cell_id)
-            elif "interactive" in cell_id.lower():
+            elif "interactive" in cell_id.lower() or 'm22-SimulationExercises' in cell_id:
                 return self.redirect_to_voila(cell_id)
             else:
                 return self.send_html_file(cell_id)

@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RecordActivityRequest, ViewContentDetails } from '../../../../../../../../helpers/services/activity/activity.interface';
 import { ActivityType } from '../../../../../../../../helpers/services/activity/activity.enums';
 import { ActivityService } from '../../../../../../../../helpers/services/activity/activity.service';
+import { ModuleNameFormatterPipe } from '../../../../../../../../helpers/pipes/module-name-formatter/module-name-formatter.pipe';
 
 @Component({
   selector: 'app-progress-bar',
@@ -20,7 +21,8 @@ import { ActivityService } from '../../../../../../../../helpers/services/activi
     MatListModule,
     MatIconModule,
     DatePipe,
-    MatTooltipModule
+    MatTooltipModule,
+    ModuleNameFormatterPipe
   ],
   templateUrl: './progress-bar.component.html',
   styleUrl: './progress-bar.component.scss'

@@ -1,3 +1,6 @@
+import dotenv
+dotenv.load_dotenv('.env')
+
 from datetime import timedelta
 import os
 from pathlib import Path
@@ -21,7 +24,9 @@ CORS_ALLOWED_ORIGINS = []
 
 if os.getenv("ALLOWED_HOSTS"):
     ALLOWED_HOSTS += os.getenv("ALLOWED_HOSTS").split(",")
-    CORS_ALLOWED_ORIGINS += os.getenv("ALLOWED_HOSTS").split(",")
+    
+if os.getenv('CORS_ALLOWED'):
+    CORS_ALLOWED_ORIGINS += os.getenv("CORS_ALLOWED").split(",")
 
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True

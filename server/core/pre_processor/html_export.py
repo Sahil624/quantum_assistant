@@ -1,14 +1,11 @@
-import json
 import os
 import re
 import shutil
 import multiprocessing
-from concurrent.futures import ProcessPoolExecutor
 import time
 import nbformat
-from nbconvert import HTMLExporter
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 import logging
 
 from server.core.base.config import config
@@ -65,6 +62,11 @@ class NotebookConverter:
         if images_source.exists():
             for image in images_source.glob('*.png'):
                 shutil.copy2(image, OUTPUT_DIR / 'images' / image.name)
+
+        # Copy Simulation Files
+        simulator_source = module_folder / 'SimulatorExercises'
+        if simulator_source.exists():
+            shutil.copytree(simulator_source, OUTPUT_DIR / 'SimulatorExercises', dirs_exist_ok=True)
 
     def convert_notebook(self, notebook_path: str):
         """Convert a single notebook to HTML files"""

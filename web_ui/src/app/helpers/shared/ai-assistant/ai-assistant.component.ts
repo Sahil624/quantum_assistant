@@ -39,7 +39,6 @@ export class AiAssistantComponent {
       this.conversationID = res.id.toString();
 
       if (pendingMessage) {
-        this.recordQuestionActivity();
         this.sendMessage(pendingMessage, true);
       }
     })
@@ -60,11 +59,12 @@ export class AiAssistantComponent {
       is_out_of_context_message: this.enableExternalSource,
       timestamp: Date.now().toString()
     };
-    this.conversation.push(tempMessage);
     this.messageUpdated.emit();
 
     if (!this.conversationID) { this.startConversation(message); }
     else {
+      this.conversation.push(tempMessage);
+      this.recordQuestionActivity();
       this.conversationService.askQuery(this.conversationID, message, this.enableExternalSource).subscribe((messages) => {
         this.conversation.pop();
         this.conversation = this.conversation.concat(messages);

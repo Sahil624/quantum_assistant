@@ -246,6 +246,7 @@ class QuantumAssistantConversation(BaseConversation):
         7. Max followup questions limit is {settings.MAX_FOLLOW_UP_LIMIT}. When this limit has reached 0 and <external_source_allowed> is false or not sent, respond with <out_of_context> as true. User will be informed for that.
         8. If <external_source_allowed> is sent true in query by user, answer the query anyway by combining the data provided in all the iterations and data from external sources (like articles, blogs, research papers etc.) as well. If external sources are used, cite link/name of those sources in response (This is very important) and send <external_sources> tag.
         9. If query is answered from context, do tell the user about it (Where you concluded the response from) in a short summary.
+        10. Answer should be short and to the point.
 
         <output>
         <concept_explanation>

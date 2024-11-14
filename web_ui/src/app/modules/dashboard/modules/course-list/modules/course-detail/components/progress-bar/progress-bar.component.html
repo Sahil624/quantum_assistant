@@ -27,7 +27,10 @@
                     <mat-icon matListItemIcon class="active-indicator">schedule</mat-icon>
                     }
 
-                    <div matListItemTitle [matTooltip]="lo.metadata?.cell_title || lo.object_id">{{lo.metadata?.cell_title || lo.object_id}}</div>
+                    <div matListItemTitle [matTooltip]="lo.object_id | moduleNameFormatter:lo.metadata?.cell_title">
+                        <!-- {{lo.metadata?.cell_title || lo.object_id}} -->
+                        {{ lo.object_id | moduleNameFormatter:lo.metadata?.cell_title }}
+                    </div>
 
                     <div class="meta-text">
 

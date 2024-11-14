@@ -10,7 +10,8 @@
                                 </button>
                                 
                                 <span class="pad-8">
-                                        {{  activeLo.metadata?.cell_title }}
+                                        <!-- {{  activeLo.metadata?.cell_title }} -->
+                                        {{ activeLo.object_id | moduleNameFormatter:activeLo.metadata?.cell_title }}
                                 </span>
 
                                 <span class="spacer"></span>

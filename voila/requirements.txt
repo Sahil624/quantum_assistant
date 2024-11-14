@@ -4,5 +4,6 @@ ipykernel==6.29.5
 voila==0.5.7
 qiskit==0.45.2
 qiskit-aer==0.14.2
+ipycanvas==0.13.3
 matplotlib
 qutip
